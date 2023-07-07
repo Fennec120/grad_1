@@ -1,0 +1,11 @@
+grad_1/data/ga_hits.pkl
+grad_1/data/ga_hits.csv
+grad_1/data/df_prepped_70k.csv
+grad_1/data/ga_sessions.pkl
+grad_1/data/ga_sessions.csv
+grad_1/data/df3_200k_50n_50p.csv
+grad_1/data/df3_100k_50n_50p.csv
+grad_1/data/df3_10k_50n_50p.csv
+grad_1/data/df3_25k_50n_50p.csv
+
+
