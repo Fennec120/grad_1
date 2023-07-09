@@ -1,0 +1,26 @@
+Moscow*0.4983%
+Saint Petersburg*0.1336%
+(not set)*0.0288%
+Kazan*0.0245%
+Krasnodar*0.0213%
+Yekaterinburg*0.0156%
+Samara*0.0138%
+Ufa*0.0125%
+Nizhny Novgorod*0.0099%
+Tula*0.0092%
+Novosibirsk*0.0089%
+Grozny*0.0085%
+Domodedovo*0.0079%
+Rostov-on-Don*0.0075%
+Krasnoyarsk*0.0072%
+Chelyabinsk*0.007%
+Balashikha*0.0064%
+Irkutsk*0.0061%
+Sochi*0.006%
+Voronezh*0.0051%
+Yaroslavl*0.0045%
+Vladivostok*0.0044%
+Khimki*0.0042%
+Korolyov*0.0039%
+Odintsovo*0.0038%
+Stavropol*0.0033%
