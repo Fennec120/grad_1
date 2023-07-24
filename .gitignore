@@ -8,3 +8,12 @@ data/df3_200k_50n_50p.csv
 data/df3_100k_50n_50p.csv
 data/df3_10k_50n_50p.csv
 data/df3_25k_50n_50p.csv
+data/df3_100k_30n_70p.csv
+data/df3_100k_70n_30p.csv
+data/df3_10k_30n_70p.csv
+data/df3_140k_30n_70p.csv
+data/df3_200k_70n_30p.csv
+data/df3_25k_30n_70p.csv
+data/df3_340k_70n_30p.csv
+data/df3_50k_30n_70p.csv
+data/df3_50k_50n_50p.csv
