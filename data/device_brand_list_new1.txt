@@ -1,0 +1,23 @@
+Apple*0.2802%
+Samsung*0.195%
+Xiaomi*0.1297%
+Huawei*0.0893%
+(not set)*0.0088%
+Realme*0.0084%
+OPPO*0.0078%
+Vivo*0.0066%
+Nokia*0.003%
+Sony*0.0027%
+Asus*0.0027%
+OnePlus*0.0026%
+Google*0.0025%
+ZTE*0.0025%
+Tecno*0.0018%
+Blackview*0.0014%
+Meizu*0.0013%
+Lenovo*0.0013%
+Motorola*0.0009%
+LG*0.0008%
+BQ*0.0007%
+itel*0.0006%
+Alcatel*0.0005%
