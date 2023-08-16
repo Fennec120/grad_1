@@ -5,6 +5,7 @@ data/df_prepped_70k.csv
 data/ga_sessions.pkl
 data/ga_sessions.csv
 data/df3_200k_50n_50p.csv
+data/df3_200k_50n_50p_tst.csv
 data/df3_100k_50n_50p.csv
 data/df3_10k_50n_50p.csv
 data/df3_25k_50n_50p.csv
@@ -21,5 +22,6 @@ data/df3_140k_30n_70p.csv
 data/df3_200k_70n_30p.csv
 data/df3_100k_20n_70p.csv
 data/df3_1kk_90n_10p.csv
+scratches.py
 
 
