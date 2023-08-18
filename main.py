@@ -1,32 +1,7 @@
 import dill
 import pandas as pd
-import numpy
-from sklearn.compose import ColumnTransformer, make_column_selector
-import time
-import datetime
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeClassifier
-import json
-from sklearn.svm import SVC
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV
-from sklearn.impute import SimpleImputer
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import GridSearchCV
-
 import fastapi
 from pydantic import BaseModel
-
 import funcs
 
 app = fastapi.FastAPI()
@@ -71,24 +46,25 @@ class Prediction(BaseModel):
     real_value: int
     type: tuple
 
+class Test(BaseModel):
+    zalupa: str
+
+class tst_list(BaseModel):
+    client: int
+    pred: int
+    real_value: int
 
 @app.get('/status')
 def status():
     return "i'm OK2"
 
-@app.post('/test', response_model=Prediction)
-def tst_1(form: Form):
-    df = pd.DataFrame.from_dict([form.dict()])
+@app.post('/test', response_model=tst_list)
+def tst_2(test: Form):
+    df = pd.DataFrame.from_dict([test.dict()])
     y = model['model'].predict(df)
     df2 = funcs.event_action(df)
 
-    return {
-    "client_id": form.client_id,
-    "pred": y[0],
-    "real_value": df2.event_action, #form.event_action,
-    "type": ('presented by ', model["metadata"]["type"])
-    }
-
+    return {'client': test.client_id, 'pred': y[0], 'real_value': df2.event_action}
 
 @app.get('/version')
 def version1():
@@ -99,12 +75,12 @@ def version1():
 def predict(form: Form):
     df = pd.DataFrame.from_dict([form.dict()])
     y = model['model'].predict(df)
+    df2 = funcs.event_action(df)
 
     return {
     "client_id": form.client_id,
     "pred": y[0],
-    "price": form.price,
+    "real_value": df2.event_action, #form.event_action,
     "type": ('presented by ', model["metadata"]["type"])
     }
-
 

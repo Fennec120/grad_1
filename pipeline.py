@@ -1,33 +1,19 @@
 import dill
 import pandas as pd
 from sklearn.compose import ColumnTransformer, make_column_selector
-import time
-import datetime
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import cross_val_score
-from sklearn.tree import DecisionTreeClassifier
-import json
-from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import GridSearchCV
-from sklearn.impute import SimpleImputer
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import GridSearchCV
 import funcs
 
 
+#  обучение и запись модели в файл
+
 cv_scores = []
 
-df4 = pd.read_csv('data/df3_200k_50n_50p_tst.csv')
+df4 = pd.read_csv('data/df3_200k_50n_50p.csv')
 
 categorical_transformer = Pipeline(steps=[
     # ('imputer', SimpleImputer(strategy='most_frequent')),
@@ -74,17 +60,6 @@ for model in models:
     y = df4['event_action']
     x = df4.drop('event_action', axis=1)
 
-    # x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=0.3)
-
-    # predictions = pipeline.predict(x_test)
-    # probs = pipeline.predict_proba(x_test)
-    # scores_single_fit.append([type(model).__name__,' test roc score - ', roc_auc_score(y_test, probs[:,1])])
-    # scores_single_fit.append([type(model).__name__,' test acc score - ', accuracy_score(y_test, predictions)])
-    # print(type(model).__name__,' test roc score - ', roc_auc_score(y_test, probs[:,1]))
-    # print(type(model).__name__,' test acc score - ', accuracy_score(y_test, predictions))
-    # interm_scores.append((str(model), 'tst roc score - ', roc_auc_score(y_test, pipeline.predict_proba(x_test)[:,1])))
-    # interm_scores.append((str(model), 'test acc score - ', accuracy_score(y_test, predictions)))
-
     pipe_summary = 'ad_camp V, resol V, cntry v2 V, cntry V, ct v2 V, ct V, brand v2 V, 200k 50/50'
     score = cross_val_score(pipeline, x, y, cv=4, scoring='roc_auc')
     cv_scores.append([round(score.mean(), 4), pipe_summary])
@@ -102,7 +77,4 @@ with open('models/pipeline_3.pkl', 'wb') as file:
         }
     }, file)
 
-# with open('models/pipeline_200k_50_50_tst.pkl', 'rb') as file:
-#     pipe_tst = dill.load(file)
-#
-print(cv_scores)
+# print(cv_scores)

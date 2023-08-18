@@ -1,6 +1,8 @@
 import pandas as pd
 import funcs
 
+# 1) подготовка датасета для обучения модели
+# 2) параллельно создаются необходимые для работы функций файлы
 
 df = pd.read_csv('data/ga_hits.csv')
 df2 = pd.read_csv('data/ga_sessions.csv')
@@ -29,8 +31,6 @@ print('device brand v2 end')
 df3 = funcs.device_brand(df3)
 print('device brand end')
 
-
-
 df3 = pd.merge(df, df2, on='session_id')
 df3 = funcs.event_action(df3)
 
@@ -44,4 +44,4 @@ for feature in feature_list:
     if 'Unnamed' in feature:
         df3 = df3.drop([feature], axis=1)
 
-df3.to_csv('data/df3_200k_50n_50p_tst.csv')
+df3.to_csv('data/df3_200k_50n_50p.csv')
