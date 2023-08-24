@@ -9,7 +9,7 @@ import json
 
 
 def event_action(df3):  # меняем текстовые значения таргет-колонки на 1/0 согласно предоставленного списка
-    print('event_action start')
+    # print('event_action start')
     target_action = ['sub_car_claim_click',
                      'sub_car_claim_submit_click',
                      'sub_open_dialog_click',
@@ -83,7 +83,7 @@ def ad_campaign_v_2(df3):
         # 3) создает в датасете колонку с процентом успеха соответствующей рекламной кампании
     # При последующих запусках берет готовый файл со значениями, далее п.3
 
-    # print('ad_campaign v2 start')
+    print('pipe starting')
     try:
         with open('data/utm_c_frec_dict3.json', 'r') as f:
             utm_c_frec_dict = json.load(f)
@@ -214,7 +214,7 @@ def country_v_2(df3):
         # 1) создает список стран с процентом успеха каждой страны от общего количества значений 1 в таргет-колонке
         # Первый запуск рекоммендуется производить на полном датасете
         # 2) Записывает список в файл
-        # 3) создает в датасете колонку с "процентом успеха" соответствующей страны
+        # 3) создает в датасете колонку с "процентом успеха" соответствующей страны, берет только 24 самые "успешные"
     # При последующих запусках берет готовый файл со значениями, далее п.3
 
     # print('country v2  start')
@@ -257,6 +257,48 @@ def country_v_2(df3):
             lambda x: country_list_new[x] if x in country_list_new else 0.0001)
 
     return df3
+
+def country_v_3(df3, trsh=0.001):
+    # При первом запуске:
+        # 1) создает список .value_counts по странам
+        # Первый запуск рекоммендуется производить на полном датасете
+        # 2) Записывает список в файл
+        # 3)Оставляет только страны, колечество появлений которых составляет больше 0.001 от длины полного датасета
+    # При последующих запусках берет готовый файл со значениями, далее п.3
+
+    # print('country_v_3 start')
+    country_list = []
+    df3_len = len(df3)
+
+    try:
+        with open('data/country_list1.txt', 'r') as f:
+            for line in f:
+                line = line.rstrip('\n').replace('(', '').replace(')', '').replace("'", '')
+                tuple_elements = [int(e.strip()) if e.strip().isdigit() else e.strip() for e in line.split(',')]
+                my_tuple = tuple(tuple_elements)
+                country_list.append(my_tuple)
+
+    except FileNotFoundError:
+        # print("oh.., looks like its the first time you run it - lil' bit longer then, m8. pls hold:)")
+
+        country_list = list(zip(df3.geo_country.value_counts().values, df3.geo_country.value_counts().keys()))
+        country_list = sorted(country_list, reverse=True)
+
+        with open('data/country_list1.txt', 'w', encoding="utf-8") as f:
+            for t in country_list:
+                f.write(str(t) + '\n')
+
+    finally:
+        country_list_valid = []
+
+        for item in country_list:
+            if item[0] / 15000000 >= trsh:
+                country_list_valid.append(item[1])
+
+        df3.loc[(~df3['geo_country'].isin(country_list_valid)), 'geo_country'] = 'some_unimportant_country'
+
+    return df3
+
 
 
 def city(df3, trsh=0.001):
@@ -482,9 +524,13 @@ def encode_stuff(df3):
 def scale_stuff(df3):
     # скалировщик
     # scaling
-    print('scale_stuff start')
+    # print('scale_stuff start')
     cols_to_scale = [  # 'visit_number',
-        'day_of_week',
+        # 'day_of_week',
+        'camp_succ_rate',
+        'geo_country_succ_perc',
+        'geo_city_succ_perc',
+        'device_brand_succ_perc',
         'device_screen_resolution'
     ]
 
@@ -493,6 +539,7 @@ def scale_stuff(df3):
     scaled_feature_names = [f'{name}_scaled' for name in scaler.get_feature_names_out()]
     df3[scaled_feature_names] = scaled_features
     df3 = df3.drop(cols_to_scale, axis=1)
+    # print(df3.columns)
 
     return df3
 
@@ -503,37 +550,24 @@ def filter_stuff(df3):
 
     # print('filter_stuff start')
     cols_to_drop = [
-        'session_id',
-        'hit_date',
-        'hit_time',
-        'hit_number',
-        'hit_type',
-        'hit_referer',
-        'hit_page_path',
-        'event_category',
-        'event_label',
-        'event_value',
-        'client_id',
+        # 'session_id',
+        # 'hit_date',
+        # 'hit_time',
+        # 'hit_number',
+        # 'hit_type',
+        # 'hit_referer',
+        # 'hit_page_path',
+        # 'event_category',
+        # 'event_label',
+        # 'event_value',
+        # 'client_id',
         # 'new_date',
-        'visit_date',
-        'visit_number',
+        # 'visit_date',
+        # 'visit_number',
         'utm_keyword',
         'device_os',
         'device_model',
-        'visit_time'
-    ]
-
-    cols_to_encode = [
-        'utm_source',
-        'utm_medium',
-        'utm_adcontent',
-        'device_brand',
-        'device_category',
-        'device_screen_resolution',
-        'device_browser',
-        'utm_campaign',
-        'geo_country',
-        'geo_city'
+        # 'visit_time'
     ]
 
     df3 = df3.drop(cols_to_drop, axis=1)
@@ -636,3 +670,20 @@ def predict_stuff(df3):
     print('train roc score - ', roc_auc_score(y_train, rf.predict_proba(x_train)[:, 1]))
     print('test roc score - ', roc_auc_score(y_test, rf.predict_proba(x_test)[:, 1]))
     pass
+
+def pre_filter(df3):
+    # оставляет только "разрешенные" колонки
+    cols_to_proon = []
+    for col in df3.columns:
+        if 'device' in col:
+            continue
+        elif 'geo'in col:
+            continue
+        elif 'utm' in col:
+            continue
+        elif 'event_action' in col:
+            continue
+        else:
+            cols_to_proon.append(col)
+    df3 = df3.drop(cols_to_proon, axis=1)
+    return df3
