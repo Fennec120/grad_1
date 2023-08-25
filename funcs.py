@@ -140,39 +140,57 @@ def resolution_func(df3):
 
     # print('resolution_func start')
     bounds = []
-    df3['resolution'] = df3.device_screen_resolution.apply(lambda x: eval(x.replace('x', '*')))
-    for device in df3.device_category.unique():
-        q25 = df3[df3.device_category == device].resolution.quantile(0.25)
-        q75 = df3[df3.device_category == device].resolution.quantile(0.75)
-        iqr = q75 - q25
-        bounds.append((device, q25 - 1.5 * iqr, q75 + 1.5 * iqr))
 
-    test_list = list(df3.device_screen_resolution)
-    test_list2 = list(df3.device_category)
+    try:
+        with open('data/resolution_bounds.txt', 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                values = line.strip().split(', ')
+                bounds.append((values[0], eval(values[1]), eval(values[2])))
 
-    for i in range(len(test_list)):
-        test_list[i] = eval(test_list[i].replace('x', '*'))
+    except FileNotFoundError:
+        df3['resolution'] = df3.device_screen_resolution.apply(lambda x: eval(x.replace('x', '*')))
+        for device in df3.device_category.unique():
+            q25 = df3[df3.device_category == device].resolution.quantile(0.25)
+            q75 = df3[df3.device_category == device].resolution.quantile(0.75)
+            iqr = q75 - q25
+            bounds.append((device, q25 - 1.5 * iqr, q75 + 1.5 * iqr))
 
-    tst_l = list(zip(test_list2, test_list))
+        with open('data/resolution_bounds.txt', 'w') as file:
+            for device in bounds:
+                line = f"{device[0]}, {device[1]}, {device[2]}\n"
+                file.write(line)
+        df3 = df3.drop('resolution', axis=1)
 
-    resolution = []
+    finally:
 
-    for i in range(len(tst_l)):
-        if tst_l[i][0] == bounds[0][0]:
-            resolution.append(bounds[0][0] + '_high' if tst_l[i][1] >= bounds[0][2] * 0.7 else (
-                bounds[0][0] + '_medium' if bounds[0][2] * 0.7 > tst_l[i][1] >= bounds[0][2] * 0.1 else bounds[0][
-                                                                                                            0] + '_low'))
-        elif tst_l[i][0] == bounds[1][0]:
-            resolution.append(bounds[1][0] + '_high' if tst_l[i][1] >= bounds[1][2] * 0.7 else (
-                bounds[1][0] + '_medium' if bounds[1][2] * 0.7 > tst_l[i][1] >= bounds[1][2] * 0.1 else bounds[1][
-                                                                                                            0] + '_low'))
-        elif tst_l[i][0] == bounds[2][0]:
-            resolution.append(bounds[2][0] + '_high' if tst_l[i][1] >= bounds[2][2] * 0.7 else (
-                bounds[2][0] + '_medium' if bounds[2][2] * 0.7 > tst_l[i][1] >= bounds[2][2] * 0.1 else bounds[2][
-                                                                                                            0] + '_low'))
+        test_list = list(df3.device_screen_resolution)
+        test_list2 = list(df3.device_category)
 
-    df3['device_screen_resolution_engeneered'] = resolution
-    df3 = df3.drop('resolution', axis=1)
+        for i in range(len(test_list)):
+            test_list[i] = eval(test_list[i].replace('x', '*'))
+
+        tst_l = list(zip(test_list2, test_list))
+
+        resolution = []
+
+        for i in range(len(tst_l)):
+            if tst_l[i][0] == bounds[0][0]:
+                resolution.append(bounds[0][0] + '_high' if tst_l[i][1] >= bounds[0][2] * 0.7 else (
+                    bounds[0][0] + '_medium' if bounds[0][2] * 0.7 > tst_l[i][1] >= bounds[0][2] * 0.1 else bounds[0][
+                                                                                                                0] + '_low'))
+            elif tst_l[i][0] == bounds[1][0]:
+                resolution.append(bounds[1][0] + '_high' if tst_l[i][1] >= bounds[1][2] * 0.7 else (
+                    bounds[1][0] + '_medium' if bounds[1][2] * 0.7 > tst_l[i][1] >= bounds[1][2] * 0.1 else bounds[1][
+                                                                                                                0] + '_low'))
+            elif tst_l[i][0] == bounds[2][0]:
+                resolution.append(bounds[2][0] + '_high' if tst_l[i][1] >= bounds[2][2] * 0.7 else (
+                    bounds[2][0] + '_medium' if bounds[2][2] * 0.7 > tst_l[i][1] >= bounds[2][2] * 0.1 else bounds[2][
+                                                                                                                0] + '_low'))
+
+        df3['device_screen_resolution_engeneered'] = resolution
+        # df3['device_screen_resolution'] = resolution
+
 
     return df3
 

@@ -1,0 +1,14 @@
+utm_source
+utm_medium
+utm_campaign
+utm_adcontent
+device_category
+device_brand
+device_browser
+geo_country
+geo_city
+camp_succ_rate_scaled
+geo_country_succ_perc_scaled
+geo_city_succ_perc_scaled
+device_brand_succ_perc_scaled
+device_screen_resolution_scaled
