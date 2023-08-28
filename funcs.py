@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import roc_auc_score
 import json
-
+from geopy.geocoders import Nominatim
 
 def event_action(df3):  # меняем текстовые значения таргет-колонки на 1/0 согласно предоставленного списка
     # print('event_action start')
@@ -549,6 +549,7 @@ def scale_stuff(df3):
         'geo_country_succ_perc',
         'geo_city_succ_perc',
         'device_brand_succ_perc',
+        'distance_from_moscow',
         'device_screen_resolution'
     ]
 
@@ -560,7 +561,6 @@ def scale_stuff(df3):
     # print(df3.columns)
 
     return df3
-
 
 def filter_stuff(df3):
     # Очистка от лишних колонок
@@ -704,4 +704,57 @@ def pre_filter(df3):
         else:
             cols_to_proon.append(col)
     df3 = df3.drop(cols_to_proon, axis=1)
+    return df3
+
+def distance_from_moscow(df3):
+    # в духе настоящего гордого жителя ПодМосковья возникла идея привязать "успех" к удаленности от Столицы...
+    # geopy берет координаты российских городов и записывает их в словарь-файл,
+    # потом измеряет расстояние до координат москвы и записывает его в колонку
+    distance_dict = dict()
+    geolocator = Nominatim(user_agent="whatever")
+    locations = dict()
+
+    try:
+        with open('data/locations_coords.txt', 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                locs = line.strip().replace('"', '').replace("'", '').replace('(', '').replace(')', '').split(', ')
+                locations[str(locs[0])] =  {'lat': eval(locs[1]), 'long':eval(locs[2])}
+            how_was_it_done = 'file was there'
+    except FileNotFoundError:
+
+        locations_to_write = []
+        russia_cities = df3[df3['geo_country'] == 'Russia'].geo_city.unique()
+        for city in russia_cities:
+            location = geolocator.geocode(f"{city}")
+
+            if location == '(not set)':
+                continue
+
+            elif location:
+                locations[str(city)] = {'lat': location.latitude, 'long': location.longitude}
+                locations_to_write.append(f'{city, location.latitude, location.longitude}')
+
+            else:
+                continue
+        with open('data/locations_coords.txt', 'w') as file:
+                for location in locations_to_write:
+                    line = f"{location}\n"
+                    file.write(line)
+        how_was_it_done = 'had to make it again..'
+
+    finally:
+        # print(how_was_it_done)
+
+        x1 = locations['Moscow']['lat']
+        y1 = locations['Moscow']['long']
+
+        for city in locations.keys():
+            x2 = locations[city]['lat']
+            y2 = locations[city]['long']
+            distance = ((x1 - x2) **2 + (y1 - y2)**2) ** 0.5
+
+            distance_dict[city] = distance
+
+        df3['distance_from_moscow'] = df3['geo_city'].apply(lambda x: distance_dict[x] if x in distance_dict else 200)
     return df3

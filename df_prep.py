@@ -35,6 +35,9 @@ for i in range(10):
 
 print('examples end')
 
+df3 = funcs.distance_from_moscow(df3)
+print('device brand end')
+
 df3 = funcs.ad_campaign_v_2(df3)
 print('ad camp end')
 
@@ -55,3 +58,4 @@ print('device brand v2 end')
 
 df3 = funcs.device_brand(df3)
 print('device brand end')
+

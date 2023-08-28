@@ -12,7 +12,6 @@ import funcs
 #  обучение и запись модели в файл
 
 cv_scores = []
-
 df4 = pd.read_csv('data/df3_200k_50n_50p_2_step_backup.csv')
 
 categorical_transformer = Pipeline(steps=[
@@ -25,7 +24,8 @@ f_transformer = ColumnTransformer(transformers=[
 
 preprocessor = Pipeline(steps=[
     ('ad_campaign_feature_creating', FunctionTransformer(funcs.ad_campaign_v_2)),
-    ('empties', FunctionTransformer(funcs.empties)),
+    ('distance from moscow', FunctionTransformer(funcs.distance_from_moscow)),
+    ('empties', FunctionTransformer(funcs.distance_from_moscow)),
     ('resolution_func v2', FunctionTransformer(funcs.resolution_func_v_2)),
     ('country v2', FunctionTransformer(funcs.country_v_2)),
     ('country v3', FunctionTransformer(funcs.country_v_3)),
@@ -34,7 +34,7 @@ preprocessor = Pipeline(steps=[
     ('device brand v2', FunctionTransformer(funcs.device_brand_v_2)),
     ('device brand', FunctionTransformer(funcs.device_brand)),
     ('filter_stuff', FunctionTransformer(funcs.filter_stuff)),
-    ('scale_stuff(resol, city, country, brand, ad_camp)', FunctionTransformer(funcs.scale_stuff)),
+    ('scale_stuff2(resol, city, country, brand, ad_camp)', FunctionTransformer(funcs.scale_stuff)),
     ('f_transformer', f_transformer)
 ])
 
